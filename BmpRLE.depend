@@ -1,0 +1,240 @@
+# depslib dependency file v1.0
+1469617318 source:c:\github\proyectos\bmprle\main.cpp
+	<iostream>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<SDL.h>
+	<math.h>
+	<Constant.h>
+	<httputil.h>
+	"ImagenGestor.h"
+	"image/uiimgdownloader.h"
+
+1467107869 source:c:\github\proyectos\bmprle\bmp2rle.c
+	<stdio.h>
+	<stdlib.h>
+	<stdint.h>
+	<string.h>
+	<math.h>
+
+1466697450 c:\github\externallibs\uiobjects\src\constant.h
+	<fstream>
+	<sstream>
+	<string.h>
+	<vector>
+	<typeinfo>
+	<ctime>
+	<dirent.h>
+	<stdio.h>
+	<limits.h>
+	<algorithm>
+	<cctype>
+	<iomanip>
+	<cstddef>
+	<stdint.h>
+	<windows.h>
+
+1469614229 c:\github\proyectos\httpcurl\httpcurl\src\httputil.h
+	<stdlib.h>
+	<string.h>
+	<stdio.h>
+	<unistd.h>
+	<fcntl.h>
+	<iostream>
+	<string>
+	<fstream>
+	<map>
+	"filecipher.h"
+	<curl/curl.h>
+	"Traza.h"
+	"unzip/GZipHelper.h"
+
+1459803212 c:\github\proyectos\rijndael\filecipher.h
+	<iostream>
+	<fstream>
+	<stdio.h>
+	<string.h>
+	"rijndael.h"
+	"sha256.h"
+	<sstream>
+	<iostream>
+	<cstdlib>
+	"Constant.h"
+
+1459803212 c:\github\proyectos\rijndael\rijndael.h
+	<iostream>
+
+1459803212 c:\github\proyectos\rijndael\sha256.h
+	<string>
+
+1419777366 c:\github\externallibs\curl-7.40.0-devel-mingw32\include\curl\curl.h
+	"curlver.h"
+	"curlbuild.h"
+	"curlrules.h"
+	<stdio.h>
+	<limits.h>
+	<osreldate.h>
+	<sys/types.h>
+	<time.h>
+	<winsock2.h>
+	<ws2tcpip.h>
+	<sys/select.h>
+	<sys/socket.h>
+	<sys/time.h>
+	<support/SupportDefs.h>
+	"easy.h"
+	"multi.h"
+	"typecheck-gcc.h"
+
+1420708698 c:\github\externallibs\curl-7.40.0-devel-mingw32\include\curl\curlver.h
+
+1420708698 c:\github\externallibs\curl-7.40.0-devel-mingw32\include\curl\curlbuild.h
+	<sys/types.h>
+	<sys/socket.h>
+
+1415109076 c:\github\externallibs\curl-7.40.0-devel-mingw32\include\curl\curlrules.h
+
+1402512750 c:\github\externallibs\curl-7.40.0-devel-mingw32\include\curl\easy.h
+
+1415109076 c:\github\externallibs\curl-7.40.0-devel-mingw32\include\curl\multi.h
+	"curl.h"
+
+1415109076 c:\github\externallibs\curl-7.40.0-devel-mingw32\include\curl\typecheck-gcc.h
+
+1398697644 c:\github\externallibs\uiobjects\src\traza.h
+	<stdio.h>
+	<time.h>
+	<string>
+	<limits.h>
+	<iostream>
+	<fstream>
+	"Constant.h"
+
+1461321039 c:\github\externallibs\uiobjects\src\unzip\gziphelper.h
+	"GZipHelper.h"
+	"zutil.h"
+
+1459803101 c:\github\externallibs\ziputils\zlib\zutil.h
+	"zlib.h"
+	<stddef.h>
+	<string.h>
+	<stdlib.h>
+	<errno.h>
+	<alloc.h>
+	<malloc.h>
+	<unix.h>
+	<stdio.h>
+
+1459803101 c:\github\externallibs\ziputils\zlib\zlib.h
+	"zconf.h"
+
+1459803101 c:\github\externallibs\ziputils\zlib\zconf.h
+	<windows.h>
+	<sys/types.h>
+	<unistd.h>
+	<unixio.h>
+
+1434553680 c:\github\externallibs\uiobjects\src\imagengestor.h
+	"Fileio.h"
+	"SHA1.h"
+	"ListaSimple.h"
+	"Excepcion.h"
+	"Dirutil.h"
+	"SDL/SDL.h"
+	"SDL/SDL_image.h"
+	"SDL/SDL_rotozoom.h"
+	"common.h"
+
+1433746723 c:\github\externallibs\uiobjects\src\fileio.h
+	<iostream>
+	<fstream>
+	<string>
+	<algorithm>
+	<vector>
+	<iterator>
+	"Excepcion.h"
+	"Traza.h"
+
+1445247084 c:\github\externallibs\uiobjects\src\excepcion.h
+	<iostream>
+	<cmath>
+	"Traza.h"
+	"Constant.h"
+
+1386695698 c:\github\externallibs\uiobjects\src\sha1.h
+	<memory.h>
+	<stdio.h>
+	<string.h>
+	<stdlib.h>
+
+1461135089 c:\github\externallibs\uiobjects\src\listasimple.h
+	<string.h>
+	<stdio.h>
+	"Excepcion.h"
+	"Fileio.h"
+	<typeinfo>
+	"Constant.h"
+	"fileprops.h"
+
+1401208624 c:\github\externallibs\uiobjects\src\fileprops.h
+	<string>
+
+1462536181 c:\github\externallibs\uiobjects\src\dirutil.h
+	"fileprops.h"
+	<dirent.h>
+	<sys/stat.h>
+	<sys/types.h>
+	<unistd.h>
+	"Traza.h"
+	"ListaSimple.h"
+	<stdio.h>
+	<windows.h>
+
+1459872931 c:\github\externallibs\uiobjects\src\common.h
+
+1433424001 c:\github\externallibs\uiobjects\src\image\uiimgdownloader.h
+	"Dirutil.h"
+	"httpcurl/httputil.h"
+	"SDL/SDL.h"
+	"ImagenGestor.h"
+	"image/uiimgencoder.h"
+
+1433416355 c:\github\externallibs\uiobjects\src\httpcurl\httputil.h
+	<stdlib.h>
+	<string.h>
+	<stdio.h>
+	<unistd.h>
+	<fcntl.h>
+	<iostream>
+	<string>
+	<fstream>
+	<map>
+
+1433425332 c:\github\externallibs\uiobjects\src\image\uiimgencoder.h
+	<SDL/SDL.h>
+	<stdlib.h>
+	<stdio.h>
+	<setjmp.h>
+	<jpeglib.h>
+	<jerror.h>
+	"SDL_imagesave/IMG_saveend.h"
+	<iostream>
+
+1433412280 c:\github\externallibs\libjpeg\src\libjpeg\jpeglib.h
+	"jconfig.h"
+	"jmorecfg.h"
+	"jpegint.h"
+	"jerror.h"
+
+1433491523 c:\github\externallibs\libjpeg\src\libjpeg\jconfig.h
+
+1433413563 c:\github\externallibs\libjpeg\src\libjpeg\jmorecfg.h
+
+1433413563 c:\github\externallibs\libjpeg\src\libjpeg\jpegint.h
+
+877179550 c:\github\externallibs\libjpeg\src\libjpeg\jerror.h
+
+1369139268 c:\github\externallibs\uiobjects\src\image\sdl_imagesave\img_saveend.h
+	<SDL/SDL_byteorder.h>
+
