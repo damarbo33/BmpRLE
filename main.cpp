@@ -76,13 +76,16 @@ uint16_t Color565(uint8_t r, uint8_t g, uint8_t b) {
   return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3);
 }
 
+/**
+*
+*/
 inline Uint32 getpixel(SDL_Surface *surface, const int x, const int y)
 {
-    //int bpp = surface->format->BytesPerPixel;
+    int bpp = surface->format->BytesPerPixel;
     /* Here p is the address to the pixel we want to retrieve */
-    Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * surface->format->BytesPerPixel;
+    Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
 
-    switch(surface->format->BytesPerPixel) {
+    switch(bpp) {
     case 1:
         return *p;
 
@@ -465,10 +468,24 @@ int rleFileToScreen(string filename, int x, int y, int lcdw, int lcdh){
     return 1;
 }
 
+/**
+*
+*/
 unsigned long surfaceTo565(SDL_Surface *mySurface){
-    int bytesPixel = mySurface->format->BytesPerPixel;
+    int bpp = mySurface->format->BytesPerPixel;
+    Uint8 r, g, b;
+    Uint32 pixel;
+    uint16_t color;
 
-    Traza::print("Bytes por pixel",bytesPixel, W_DEBUG);
+    for (int j=0; j < 256; j++){
+        for (int i=0; i < 256; i++){
+            SDL_GetRGB(getpixel(mySurface, i, j), mySurface->format, &r, &g, &b);
+            color = Color565(r,g,b);
+            putpixel(screen, i, j, color);
+        }
+    }
+
+    Traza::print("Bytes por pixel", bpp, W_DEBUG);
     return 0;
 
 }
@@ -478,8 +495,10 @@ unsigned long surfaceTo565(SDL_Surface *mySurface){
 */
 void downloadMap(string url){
 
+
     HttpUtil utilHttp;
     bool ret = utilHttp.download(url);
+
 
     if (!ret){
         Traza::print("Imposible conectar a: " + url, W_ERROR);
