@@ -76,6 +76,32 @@ uint16_t Color565(uint8_t r, uint8_t g, uint8_t b) {
   return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3);
 }
 
+inline Uint32 getpixel(SDL_Surface *surface, const int x, const int y)
+{
+    //int bpp = surface->format->BytesPerPixel;
+    /* Here p is the address to the pixel we want to retrieve */
+    Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * surface->format->BytesPerPixel;
+
+    switch(surface->format->BytesPerPixel) {
+    case 1:
+        return *p;
+
+    case 2:
+        return *(Uint16 *)p;
+
+    case 3:
+        if(SDL_BYTEORDER == SDL_BIG_ENDIAN)
+            return p[0] << 16 | p[1] << 8 | p[2];
+        else
+            return p[0] | p[1] << 8 | p[2] << 16;
+
+    case 4:
+        return *(Uint32 *)p;
+
+    default:
+        return 0;       /* shouldn't happen, but avoids warnings */
+    }
+}
 /*
  * Set the pixel at (x, y) to the given value
  * NOTE: The surface must be locked before calling this!
@@ -451,10 +477,6 @@ unsigned long surfaceTo565(SDL_Surface *mySurface){
 *
 */
 void downloadMap(string url){
-    Constant::setPROXYIP("10.129.8.100");
-    Constant::setPROXYPORT("8080");
-    Constant::setPROXYUSER("dmarcobo");
-    Constant::setPROXYPASS("bC6E4X0V3c");
 
     HttpUtil utilHttp;
     bool ret = utilHttp.download(url);
