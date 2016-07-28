@@ -54,9 +54,11 @@ int main(int argc, char *argv[]){
     //convertTo565Rle("C:\\Users\\dmarcobo\\Desktop\\Maperitive\\Tiles\\mapnikTiles\\16\\Imagen1.bmp");
     //rleFileToScreen("C:\\Users\\dmarcobo\\Desktop\\Maperitive\\Tiles\\mapnikTiles\\16\\Imagen1.r65", 0, 0, 256, 256);
     //toScreen565("C:\\Users\\dmarcobo\\Desktop\\Maperitive\\Tiles\\mapnikTiles\\16\\Imagen1.565", 0, 0, 256, 256);
+    
 
     //imagen.downloadMap("http://b.tile.opencyclemap.org/cycle/16/32692/25161.png", "D:\\PruebasMapas\\Tiles565");
-    imagen.downloadMap("http://a.tile.openstreetmap.org/16/32692/25161.png", "D:\\PruebasMapas\\Tiles565");
+    //imagen.downloadMap("http://a.tile.openstreetmap.org/16/32677/25199.png", "C:\\PruebasMapas\\Tiles565");
+    imagen.downloadMap(OPENCYCLEMAP + "16/32677/25199.png", "C:\\PruebasMapas\\Tiles565");
 
 
     bool salir = false;
@@ -67,13 +69,10 @@ int main(int argc, char *argv[]){
                 salir = true;
             }
         }
-
         //rleToScreen("C:\\Users\\dmarcobo\\Desktop\\Maperitive\\Tiles\\mapnikTiles\\16\\25160.bmp_rle.bmp", 0, 0, 128, 160);
         //showMap();
         SDL_UpdateRect(imagen.screen, 0, 0, 0, 0);
     }
-
-
     return 0;
 }
 

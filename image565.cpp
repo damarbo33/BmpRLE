@@ -439,8 +439,11 @@ unsigned long Image565::surfaceTo565(SDL_Surface *mySurface, string filename, bo
     int counter = 0;
     uint32_t maxRep = pow(2, sizeof(lastColor.n) * 8) - 1;
     size_t totalLength = 0;
+    unsigned long totalBytes = 0;
 
     FILE *outBmpFile = fopen(filename.c_str(),"wb+");
+
+    Traza::print("recorriendo imagen de : " + Constant::TipoToStr(mySurface->w) + "," + Constant::TipoToStr(mySurface->h), W_DEBUG);
 
     for (int j=0; j < mySurface->h; j++){
         for (int i=0; i < mySurface->w; i++){
@@ -450,6 +453,7 @@ unsigned long Image565::surfaceTo565(SDL_Surface *mySurface, string filename, bo
 
             if (!rleFlag){
                 fwrite(&color, sizeof(color), 1, outBmpFile);
+                totalLength++;
             } else {
                 if (j == 0 && i == 0){
                     lastColor.n = 1;
@@ -476,7 +480,11 @@ unsigned long Image565::surfaceTo565(SDL_Surface *mySurface, string filename, bo
         totalLength++;
     }
 
-    unsigned long totalBytes = (totalLength * sizeof(lastColor.n) + totalLength * sizeof(lastColor.color));
+    if (rleFlag)
+        totalBytes = (totalLength * sizeof(lastColor.n) + totalLength * sizeof(lastColor.color));
+    else
+        totalBytes = totalLength * sizeof(color);
+
     fclose(outBmpFile);
     return totalBytes;
 }
@@ -553,10 +561,14 @@ void Image565::downloadMap(string url, string diroutput){
             unsigned long tam = 0;
             Traza::print("Imagen obtenida correctamente: " + url, W_DEBUG);
             tam = surfaceTo565(mySurface, fichImagen + ".r65", true);
+
             if (tam > mySurface->w * mySurface->h * 2){
+                Traza::print("Imagen 565 con rle de tamanyo excesivo (KBytes)", tam / 1024, W_DEBUG);
                 tam = surfaceTo565(mySurface, fichImagen + ".565", false);
                 Traza::print("Imagen 565 sin rle de tamanyo (KBytes)", tam / 1024, W_DEBUG);
                 //toScreen565(fichImagen + ".565", 0,0,256,256);
+                Dirutil dir;
+                dir.borrarArchivo(fichImagen + ".r65");
             } else {
                 Traza::print("Imagen 565 con rle de tamanyo (KBytes)", tam / 1024, W_DEBUG);
                 //rleFileToScreen(fichImagen + ".r65", 0,0,256,256);

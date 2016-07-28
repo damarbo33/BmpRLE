@@ -1,15 +1,7 @@
 # depslib dependency file v1.0
-1469623868 source:c:\github\proyectos\bmprle\main.cpp
+1469694809 source:c:\github\proyectos\bmprle\main.cpp
 	<iostream>
-	<stdio.h>
-	<stdlib.h>
-	<string.h>
-	<SDL.h>
-	<math.h>
-	<Constant.h>
-	<httputil.h>
-	"ImagenGestor.h"
-	"image/uiimgdownloader.h"
+	"image565.h"
 
 1467107869 source:c:\github\proyectos\bmprle\bmp2rle.c
 	<stdio.h>
@@ -466,6 +458,20 @@
 	"image565.h"
 
 1469646512 d:\github\codeblocks\proyectos\bmprle\image565.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<SDL/SDL.h>
+	<math.h>
+	<Constant.h>
+	<httputil.h>
+	"ImagenGestor.h"
+	"image/uiimgdownloader.h"
+
+1469695069 source:c:\github\proyectos\bmprle\image565.cpp
+	"image565.h"
+
+1469694850 c:\github\proyectos\bmprle\image565.h
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
