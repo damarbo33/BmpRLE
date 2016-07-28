@@ -77,6 +77,8 @@
 			<Add directory="../../ExternalLibs/curl-7.40.0-devel-mingw32/lib" />
 			<Add directory="../../ExternalLibs/tidy/bin/Release" />
 		</Linker>
+		<Unit filename="image565.cpp" />
+		<Unit filename="image565.h" />
 		<Unit filename="main.cpp" />
 		<Extensions>
 			<code_completion />
