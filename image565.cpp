@@ -216,6 +216,114 @@ unsigned long Image565::convertTo565(string filename){
 }
 
 /**
+* Carga los datos de la cabecera del bmp y lo deja posicionado en
+* la direccion de memoria correspondiente para poder leerlo
+*/
+bool Image565::cargarBmp(string imgLocation, t_mapSurface *surface){
+
+	surface->bmpFile = fopen(imgLocation.c_str(),"rb");
+	surface->goodBmp = false;
+
+	if(surface->bmpFile != NULL && read16(surface->bmpFile) == 0x4D42) { // BMP signature
+		(void)read32(surface->bmpFile); // Read & ignore file size
+		(void)read32(surface->bmpFile); // Read & ignore creator bytes
+		surface->bmpImageoffset = read32(surface->bmpFile); // Start of image data
+		////Serial.print("Image Offset: "); //Serial.println(surface->bmpImageoffset, DEC);
+		// Read DIB header
+		(void)read32(surface->bmpFile); // Read & ignore header size
+		surface->bmpWidth  = read32(surface->bmpFile);
+		surface->bmpHeight = read32(surface->bmpFile);
+		////Serial.print("bmpWidth: "); //Serial.println(surface->bmpWidth);
+		////Serial.print("bmpHeight: "); //Serial.println(surface->bmpHeight);
+
+		if(surface->bmpHeight < 0) {
+		  surface->bmpHeight = -surface->bmpHeight;
+		  surface->flip = false;
+		}
+		// BMP rows are padded (if needed) to 4-byte boundary
+		surface->rowSize = (surface->bmpWidth * 3 + 3) & ~3;
+
+		if(read16(surface->bmpFile) == 1) { // # planes -- must be '1'
+		  surface->bmpDepth = read16(surface->bmpFile); // bits per pixel
+		  ////Serial.print("Bit Depth: "); //Serial.println(surface->bmpDepth);
+		  if((surface->bmpDepth == 24) && (read32(surface->bmpFile) == 0)) { // 0 = uncompressed
+			surface->goodBmp = true; // Supported BMP format -- proceed!
+		  }
+		}
+	}
+//	if(!surface->goodBmp){
+//		//Serial.println("BMP format not recognized.");
+//	}
+	return surface->goodBmp;
+}
+
+/**
+* Converts a BMP into a 565 image
+*/
+unsigned long Image565::bmpdraw(t_mapSurface *surface, int x, int y,
+                                int offsetX, int offsetY){
+
+    uint8_t  sdbuffer[3*BUFFPIXEL]; // pixel buffer (R+G+B per pixel)
+    surface->buffidx = sizeof(sdbuffer); // Current position in sdbuffer
+    uint8_t  r, g, b;
+    int bmpSize = 0;
+    uint16_t color;
+    size_t totalLength = 0;
+    const int finx = (screen->w - offsetX > surface->bmpWidth) ? surface->bmpWidth: screen->w - offsetX;
+    const int finy = (screen->h - offsetY > surface->bmpHeight) ? surface->bmpHeight: screen->h - offsetY;
+
+	if(surface->goodBmp &&  finx > x && finy > y){
+
+        cout << x + offsetX << "," << y + offsetY << "," << offsetX + finx << "," << offsetY + finy << endl;
+
+        for (surface->row=y; surface->row < finy; surface->row++) { // For each scanline...
+          // Seek to start of scan line.  It might seem labor-
+          // intensive to be doing this on every line, but this
+          // method covers a lot of gritty details like cropping
+          // and scanline padding.  Also, the seek only takes
+          // place if the file position actually needs to change
+          // (avoids a lot of cluster math in SD library).
+          if(surface->flip) // Bitmap is stored bottom-to-top order (normal BMP)
+            surface->pos = x * 3 + surface->bmpImageoffset + (surface->bmpHeight - 1 - surface->row) * surface->rowSize;
+          else     // Bitmap is stored top-to-bottom
+            surface->pos = x * 3 + surface->bmpImageoffset + surface->row * surface->rowSize;
+
+//          fpos_t t;
+//          fgetpos(surface->bmpFile, &t);
+
+          if(ftell(surface->bmpFile) != surface->pos) { // Need seek?
+            fseek(surface->bmpFile, surface->pos, SEEK_SET);
+            surface->buffidx = sizeof(sdbuffer); // Force buffer reload
+          }
+
+          for (surface->col=x; surface->col < finx; surface->col++) { // For each pixel...
+            // Time to read more pixel data?
+            if (surface->buffidx >= sizeof(sdbuffer)) { // Indeed
+              fread(sdbuffer, 1, sizeof(sdbuffer), surface->bmpFile);
+              surface->buffidx = 0; // Set index to beginning
+            }
+
+            // Convert pixel from BMP to TFT format, push to display
+            b = sdbuffer[surface->buffidx++];
+            g = sdbuffer[surface->buffidx++];
+            r = sdbuffer[surface->buffidx++];
+            color = SDL_MapRGB(screen->format, r,g,b);
+
+            putpixel(screen, surface->col + offsetX, surface->row + offsetY, color);
+            //color = Color565(r,g,b);
+            //fwrite(&color, sizeof(color), 1, outBmpFile);
+          } // end pixel
+        } // end scanline
+    }
+
+    fclose(surface->bmpFile);
+//    cout << endl;
+    unsigned long totalKB = (totalLength * sizeof(color))/1024;
+//    cout << "totalLength: " << totalKB << "Kbytes" << endl;
+    return totalKB;
+}
+
+/**
 * Converts a BMP into a 565 image with RLE compresion
 */
 unsigned long Image565::convertTo565Rle(string filename){
@@ -554,8 +662,9 @@ void Image565::downloadMap(string url, string diroutput){
         //Redimensionamos la imagen al tamanyo indicado
         SDL_Surface *mySurface = NULL;
         ImagenGestor imgGestor;
-        Traza::print("Cargando imagen de bytes: ",utilHttp.getDataLength() , W_DEBUG);
+        Traza::print("Cargando imagen de bytes: ", utilHttp.getDataLength() , W_DEBUG);
         imgGestor.loadImgFromMem(utilHttp.getRawData(), utilHttp.getDataLength(), &mySurface);
+        utilHttp.writeToFile(fichImagen + ".png");
 
         if (mySurface != NULL){
             unsigned long tam = 0;
