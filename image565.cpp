@@ -263,18 +263,19 @@ bool Image565::cargarBmp(string imgLocation, t_mapSurface *surface){
 unsigned long Image565::bmpdraw(t_mapSurface *surface, int x, int y,
                                 int offsetX, int offsetY){
 
-    uint8_t  sdbuffer[3*BUFFPIXEL]; // pixel buffer (R+G+B per pixel)
+    uint8_t  sdbuffer[3*RGBBUFFPIXEL]; // pixel buffer (R+G+B per pixel)
     surface->buffidx = sizeof(sdbuffer); // Current position in sdbuffer
     uint8_t  r, g, b;
     int bmpSize = 0;
     uint16_t color;
     size_t totalLength = 0;
-    const int finx = (screen->w - offsetX > surface->bmpWidth) ? surface->bmpWidth: screen->w - offsetX;
-    const int finy = (screen->h - offsetY > surface->bmpHeight) ? surface->bmpHeight: screen->h - offsetY;
+
+    const int finx = (screen->w - offsetX > surface->bmpWidth ) ? surface->bmpWidth  : screen->w - offsetX - 4;
+    const int finy = (screen->h - offsetY > surface->bmpHeight) ? surface->bmpHeight : screen->h - offsetY - 4;
 
 	if(surface->goodBmp &&  finx > x && finy > y){
 
-        cout << x + offsetX << "," << y + offsetY << "," << offsetX + finx << "," << offsetY + finy << endl;
+        cout << "(x,y): " << "(" << x << "," << y << ") - " << "(" << x + offsetX << "," << y + offsetY << "); (" << offsetX + finx << "," << offsetY + finy << ")" << endl;
 
         for (surface->row=y; surface->row < finy; surface->row++) { // For each scanline...
           // Seek to start of scan line.  It might seem labor-
