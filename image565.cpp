@@ -270,8 +270,8 @@ unsigned long Image565::bmpdraw(t_mapSurface *surface, int x, int y,
     uint16_t color;
     size_t totalLength = 0;
 
-    const int finx = (screen->w - offsetX > surface->bmpWidth ) ? surface->bmpWidth  : screen->w - offsetX - 4;
-    const int finy = (screen->h - offsetY > surface->bmpHeight) ? surface->bmpHeight : screen->h - offsetY - 4;
+    const int finx = (screen->w - offsetX  - 4 > surface->bmpWidth ) ? surface->bmpWidth  : screen->w - offsetX - 4;
+    const int finy = (screen->h - offsetY - 4 > surface->bmpHeight) ? surface->bmpHeight : screen->h - offsetY - 4;
 
 	if(surface->goodBmp &&  finx > x && finy > y){
 
