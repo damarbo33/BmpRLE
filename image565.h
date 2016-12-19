@@ -11,7 +11,7 @@
 #include "ImagenGestor.h"
 #include "image/uiimgdownloader.h"
 
-#define BUFFPIXEL 30
+#define RGBBUFFPIXEL 30
 
 static const string OPENCYCLEMAP  = "http://b.tile.opencyclemap.org/cycle/";
 static const string OPENSTREETMAP = "http://a.tile.openstreetmap.org/";

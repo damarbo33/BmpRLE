@@ -117,7 +117,7 @@ unsigned long Image565::convertTo565(string filename){
     uint8_t  bmpDepth;              // Bit depth (currently must be 24)
     uint32_t bmpImageoffset;        // Start of image data in file
     uint32_t rowSize;               // Not always = bmpWidth; may have padding
-    uint8_t  sdbuffer[3*BUFFPIXEL]; // pixel buffer (R+G+B per pixel)
+    uint8_t  sdbuffer[3*RGBBUFFPIXEL]; // pixel buffer (R+G+B per pixel)
     uint8_t  buffidx = sizeof(sdbuffer); // Current position in sdbuffer
     bool  flip    = true;        // BMP is stored bottom-to-top
     int      w, h, row, col;
@@ -223,7 +223,7 @@ unsigned long Image565::convertTo565Rle(string filename){
     uint8_t  bmpDepth;              // Bit depth (currently must be 24)
     uint32_t bmpImageoffset;        // Start of image data in file
     uint32_t rowSize;               // Not always = bmpWidth; may have padding
-    uint8_t  sdbuffer[3*BUFFPIXEL]; // pixel buffer (R+G+B per pixel)
+    uint8_t  sdbuffer[3*RGBBUFFPIXEL]; // pixel buffer (R+G+B per pixel)
     uint8_t  buffidx = sizeof(sdbuffer); // Current position in sdbuffer
     bool  flip    = true;        // BMP is stored bottom-to-top
     int      w, h, row, col;
@@ -539,43 +539,54 @@ string Image565::existeFichero(string url, string diroutput){
 */
 void Image565::downloadMap(string url, string diroutput){
     HttpUtil utilHttp;
+    utilHttp.setTimeout(10);
 
     string fichImagen = existeFichero(url, diroutput);
     if (fichImagen.empty()){
         Traza::print("La imagen ya existia en el disco: " + url, W_DEBUG);
         return;
     }
+    bool downloaded = false;
+    int retries = 0;
 
-    bool ret = utilHttp.download(url);
 
-    if (!ret){
-        Traza::print("Imposible conectar a: " + url, W_ERROR);
-    } else {
-        //Redimensionamos la imagen al tamanyo indicado
-        SDL_Surface *mySurface = NULL;
-        ImagenGestor imgGestor;
-        Traza::print("Cargando imagen de bytes: ",utilHttp.getDataLength() , W_DEBUG);
-        imgGestor.loadImgFromMem(utilHttp.getRawData(), utilHttp.getDataLength(), &mySurface);
+    while(!downloaded && retries < 3){
+        bool ret = utilHttp.download(url);
+        utilHttp.writeToFile(fichImagen + ".png");
 
-        if (mySurface != NULL){
-            unsigned long tam = 0;
-            Traza::print("Imagen obtenida correctamente: " + url, W_DEBUG);
-            tam = surfaceTo565(mySurface, fichImagen + ".r65", true);
-
-            if (tam > mySurface->w * mySurface->h * 2){
-                Traza::print("Imagen 565 con rle de tamanyo excesivo (KBytes)", tam / 1024, W_DEBUG);
-                tam = surfaceTo565(mySurface, fichImagen + ".565", false);
-                Traza::print("Imagen 565 sin rle de tamanyo (KBytes)", tam / 1024, W_DEBUG);
-                //toScreen565(fichImagen + ".565", 0,0,256,256);
-                Dirutil dir;
-                dir.borrarArchivo(fichImagen + ".r65");
-            } else {
-                Traza::print("Imagen 565 con rle de tamanyo (KBytes)", tam / 1024, W_DEBUG);
-                //rleFileToScreen(fichImagen + ".r65", 0,0,256,256);
-            }
+        if (!ret){
+            Traza::print("Imposible conectar a: " + url, W_ERROR);
+            downloaded = true;
         } else {
-            Traza::print("Error al obtener la imagen: " + url, W_ERROR);
+            //Redimensionamos la imagen al tamanyo indicado
+            SDL_Surface *mySurface = NULL;
+            ImagenGestor imgGestor;
+            Traza::print("Cargando imagen de bytes: ",utilHttp.getDataLength() , W_DEBUG);
+            imgGestor.loadImgFromMem(utilHttp.getRawData(), utilHttp.getDataLength(), &mySurface);
+
+            if (mySurface != NULL){
+                unsigned long tam = 0;
+                Traza::print("Imagen obtenida correctamente: " + url, W_DEBUG);
+                tam = surfaceTo565(mySurface, fichImagen + ".r65", true);
+
+                if (tam > mySurface->w * mySurface->h * 2){
+                    Traza::print("Imagen 565 con rle de tamanyo excesivo (KBytes)", tam / 1024, W_DEBUG);
+                    tam = surfaceTo565(mySurface, fichImagen + ".565", false);
+                    Traza::print("Imagen 565 sin rle de tamanyo (KBytes)", tam / 1024, W_DEBUG);
+                    //toScreen565(fichImagen + ".565", 0,0,256,256);
+                    Dirutil dir;
+                    dir.borrarArchivo(fichImagen + ".r65");
+                } else {
+                    Traza::print("Imagen 565 con rle de tamanyo (KBytes)", tam / 1024, W_DEBUG);
+                    //rleFileToScreen(fichImagen + ".r65", 0,0,256,256);
+                }
+                downloaded = true;
+            } else {
+                Traza::print("Error al obtener la imagen: " + url, W_ERROR);
+            }
         }
+        retries++;
     }
-    cout << utilHttp.getDataLength() << endl;
+
+//    cout << utilHttp.getDataLength() << endl;
 }

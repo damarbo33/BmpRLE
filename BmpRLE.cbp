@@ -30,6 +30,8 @@
 			</Target>
 		</Build>
 		<Compiler>
+			<Add option="-DWIN" />
+			<Add option="-DWIN32" />
 			<Add directory="../../ExternalLibs/sqllite/src" />
 			<Add directory="../../ExternalLibs/libjpeg/src/libjpeg" />
 			<Add directory="../../ExternalLibs/UIObjects/src" />
@@ -43,6 +45,9 @@
 			<Add directory="../rijndael" />
 			<Add directory="../httpCurl/httpcurl/src/jsoncpp-0.10.5/include" />
 			<Add directory="../../ExternalLibs/tidy/include" />
+			<Add directory="C:/Program Files (x86)/Codeblocks/CodeBlocks16/MinGW/include" />
+			<Add directory="C:/Program Files (x86)/Codeblocks/SDL/libs/include" />
+			<Add directory="C:/Program Files (x86)/Codeblocks/SDL/libs/include/SDL" />
 		</Compiler>
 		<Linker>
 			<Add option="-lUIObjects" />
@@ -76,6 +81,9 @@
 			<Add directory="../httpCurl/httpcurl/bin/Release" />
 			<Add directory="../../ExternalLibs/curl-7.40.0-devel-mingw32/lib" />
 			<Add directory="../../ExternalLibs/tidy/bin/Release" />
+			<Add directory="C:/Program Files (x86)/Codeblocks/CodeBlocks16/MinGW/lib" />
+			<Add directory="C:/Program Files (x86)/Codeblocks/SDL/libs/lib" />
+			<Add directory="C:/Program Files (x86)/Codeblocks/SDL/libs/lib/x86" />
 		</Linker>
 		<Unit filename="image565.cpp" />
 		<Unit filename="image565.h" />
