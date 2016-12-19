@@ -22,6 +22,31 @@ struct t_rle{
     uint32_t n;
 };
 
+class t_mapSurface{
+
+    public:
+        t_mapSurface(){
+            goodBmp = false;
+            flip    = true;
+            pos = 0;
+            lastVLine = -1;
+        }
+        ~t_mapSurface(){};
+
+        FILE *bmpFile;
+        SDL_Surface *tmpSurface;
+        int      bmpWidth, bmpHeight;   // W+H in pixels
+        uint8_t  bmpDepth;              // Bit depth (currently must be 24)
+        uint32_t bmpImageoffset;        // Start of image data in file
+        uint32_t rowSize;               // Not always = bmpWidth; may have padding
+        uint8_t  buffidx; // Current position in sdbuffer
+        bool  goodBmp;       // Set to true on valid header parse
+        bool  flip;        // BMP is stored bottom-to-top
+        int      w, h, row, col;
+        uint32_t pos;
+        int lastVLine;
+};
+
 class Image565
 {
     public:
@@ -30,6 +55,8 @@ class Image565
 
         SDL_Surface *screen;
         void downloadMap(string url, string diroutput);
+        unsigned long bmpdraw(t_mapSurface *surface, int x, int y, int offsetX, int offsetY);
+        bool cargarBmp(string imgLocation, t_mapSurface *surface);
 
 
     protected:
@@ -43,9 +70,12 @@ class Image565
         uint16_t Color565(uint8_t r, uint8_t g, uint8_t b);
         string existeFichero(string url, string diroutput);
 
+
         uint8_t read8(FILE *f);
         uint32_t read32(FILE *f);
         uint16_t read16(FILE *f);
+
+
 
     private:
 
