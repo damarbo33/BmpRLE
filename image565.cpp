@@ -216,6 +216,48 @@ unsigned long Image565::convertTo565(string filename){
 }
 
 /**
+*
+*/
+bool Image565::tileLoad(string imgLocation, t_mapSurface *surface){
+    Dirutil dir;
+    //Primero busca fichero 565
+    string fichPath = imgLocation + ".565";
+    if (dir.existe(fichPath)){
+        surface->bmpFile = fopen(fichPath.c_str(),"rb");
+        surface->goodBmp = false;
+        if(surface->bmpFile != NULL){
+            surface->bmpImageoffset = 0;
+            surface->bmpWidth = mapWidth;
+            surface->bmpHeight = mapHeight;
+            surface->flip = false;
+            surface->rowSize = (surface->bmpWidth * 2 + 2) & ~2;
+            surface->bmpDepth = 16;
+            surface->goodBmp = true;
+            surface->bmpType =IM565;
+        }
+    }
+    //Luego r65
+
+    //Finalmente busca bmp
+     else {
+        fichPath = imgLocation + ".bmp";
+        cargarBmp(fichPath, surface);
+     }
+     return surface->goodBmp;
+}
+
+/**
+* Converts a BMP into a 565 image
+*/
+void Image565::tileDraw(t_mapSurface *surface, int x, int y,
+                                int offsetX, int offsetY){
+    if (surface->bmpType == BMP || surface->bmpType == IM565){
+        bmpdraw(surface, x, y, offsetX, offsetY);
+    }
+    fclose(surface->bmpFile);
+}
+
+/**
 * Carga los datos de la cabecera del bmp y lo deja posicionado en
 * la direccion de memoria correspondiente para poder leerlo
 */
@@ -248,6 +290,7 @@ bool Image565::cargarBmp(string imgLocation, t_mapSurface *surface){
 		  ////Serial.print("Bit Depth: "); //Serial.println(surface->bmpDepth);
 		  if((surface->bmpDepth == 24) && (read32(surface->bmpFile) == 0)) { // 0 = uncompressed
 			surface->goodBmp = true; // Supported BMP format -- proceed!
+			surface->bmpType = BMP;
 		  }
 		}
 	}
@@ -260,12 +303,14 @@ bool Image565::cargarBmp(string imgLocation, t_mapSurface *surface){
 /**
 * Converts a BMP into a 565 image
 */
-unsigned long Image565::bmpdraw(t_mapSurface *surface, int x, int y,
+void Image565::bmpdraw(t_mapSurface *surface, int x, int y,
                                 int offsetX, int offsetY){
 
-    uint8_t  sdbuffer[3*RGBBUFFPIXEL]; // pixel buffer (R+G+B per pixel)
+    uint8_t pixelBytes = surface->bmpType == BMP ? 3 : 2;
+    uint8_t  sdbuffer[pixelBytes*RGBBUFFPIXEL]; // pixel buffer (R+G+B per pixel)
     surface->buffidx = sizeof(sdbuffer); // Current position in sdbuffer
     uint8_t  r, g, b;
+    uint8_t lo, hi;
     int bmpSize = 0;
     uint16_t color;
     size_t totalLength = 0;
@@ -285,9 +330,9 @@ unsigned long Image565::bmpdraw(t_mapSurface *surface, int x, int y,
           // place if the file position actually needs to change
           // (avoids a lot of cluster math in SD library).
           if(surface->flip) // Bitmap is stored bottom-to-top order (normal BMP)
-            surface->pos = x * 3 + surface->bmpImageoffset + (surface->bmpHeight - 1 - surface->row) * surface->rowSize;
+            surface->pos = x * pixelBytes + surface->bmpImageoffset + (surface->bmpHeight - 1 - surface->row) * surface->rowSize;
           else     // Bitmap is stored top-to-bottom
-            surface->pos = x * 3 + surface->bmpImageoffset + surface->row * surface->rowSize;
+            surface->pos = x * pixelBytes + surface->bmpImageoffset + surface->row * surface->rowSize;
 
 //          fpos_t t;
 //          fgetpos(surface->bmpFile, &t);
@@ -305,10 +350,16 @@ unsigned long Image565::bmpdraw(t_mapSurface *surface, int x, int y,
             }
 
             // Convert pixel from BMP to TFT format, push to display
-            b = sdbuffer[surface->buffidx++];
-            g = sdbuffer[surface->buffidx++];
-            r = sdbuffer[surface->buffidx++];
-            color = SDL_MapRGB(screen->format, r,g,b);
+            if (surface->bmpType == IM565){
+                lo = sdbuffer[surface->buffidx++];
+                hi = sdbuffer[surface->buffidx++];
+                color = hi << 8 | lo;
+            } else if (surface->bmpType == BMP){
+                b = sdbuffer[surface->buffidx++];
+                g = sdbuffer[surface->buffidx++];
+                r = sdbuffer[surface->buffidx++];
+                color = SDL_MapRGB(screen->format, r,g,b);
+            }
 
             putpixel(screen, surface->col + offsetX, surface->row + offsetY, color);
             //color = Color565(r,g,b);
@@ -318,10 +369,6 @@ unsigned long Image565::bmpdraw(t_mapSurface *surface, int x, int y,
     }
 
     fclose(surface->bmpFile);
-//    cout << endl;
-    unsigned long totalKB = (totalLength * sizeof(color))/1024;
-//    cout << "totalLength: " << totalKB << "Kbytes" << endl;
-    return totalKB;
 }
 
 /**
@@ -502,7 +549,6 @@ int Image565::toScreen565(string filename, int x, int y, int lcdw, int lcdh){
 int Image565::rleFileToScreen(string filename, int x, int y, int lcdw, int lcdh){
     uint32_t repetitions = 0;
     uint16_t pixelValue = 0;
-
     int counter = 0;
     int scrX = 0;
     int scrY = 0;
@@ -677,18 +723,19 @@ void Image565::downloadMap(string url, string diroutput){
                 unsigned long tam = 0;
                 Traza::print("Imagen obtenida correctamente: " + url, W_DEBUG);
                 tam = surfaceTo565(mySurface, fichImagen + ".r65", true);
+                tam = surfaceTo565(mySurface, fichImagen + ".565", false);
 
-                if (tam > mySurface->w * mySurface->h * 2){
-                    Traza::print("Imagen 565 con rle de tamanyo excesivo (KBytes)", tam / 1024, W_DEBUG);
-                    tam = surfaceTo565(mySurface, fichImagen + ".565", false);
-                    Traza::print("Imagen 565 sin rle de tamanyo (KBytes)", tam / 1024, W_DEBUG);
-                    //toScreen565(fichImagen + ".565", 0,0,256,256);
-                    Dirutil dir;
-                    dir.borrarArchivo(fichImagen + ".r65");
-                } else {
-                    Traza::print("Imagen 565 con rle de tamanyo (KBytes)", tam / 1024, W_DEBUG);
-                    //rleFileToScreen(fichImagen + ".r65", 0,0,256,256);
-                }
+//                if (tam > mySurface->w * mySurface->h * 2){
+//                    Traza::print("Imagen 565 con rle de tamanyo excesivo (KBytes)", tam / 1024, W_DEBUG);
+//                    tam = surfaceTo565(mySurface, fichImagen + ".565", false);
+//                    Traza::print("Imagen 565 sin rle de tamanyo (KBytes)", tam / 1024, W_DEBUG);
+//                    //toScreen565(fichImagen + ".565", 0,0,256,256);
+//                    Dirutil dir;
+//                    dir.borrarArchivo(fichImagen + ".r65");
+//                } else {
+//                    Traza::print("Imagen 565 con rle de tamanyo (KBytes)", tam / 1024, W_DEBUG);
+//                    //rleFileToScreen(fichImagen + ".r65", 0,0,256,256);
+//                }
                 downloaded = true;
 
             } else {
